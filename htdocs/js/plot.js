@@ -283,7 +283,9 @@ vz.wui.drawPlot = function () {
 		}
 
 		var serie = {
-			data: tuples,
+		    data: tuples,
+		        // CF added section:
+                        section: entity.section,
 			color: entity.color,
 			label: entity.title,
 			title: entity.title,

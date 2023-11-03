@@ -157,10 +157,55 @@ The plugin also adds four public methods:
                     ctx.lineTo(plot.width(), drawY);
                 }
                 ctx.stroke();
+
+                // CF draw rect
+                //console.log("crosshair.drawOverlay");
+                for (var i in plot.getData()) {
+		    var series = plot.getData()[i];
+		    var xaxis  = series.xaxis;
+		    //var xaxis  = plot.getAxes().xaxis;                    
+		    
+		    //console.log(series.section);	
+		    var j, ival;
+		    for (var k in series.section) {
+			if (k != "version") {
+			//console.log(k);
+			    ival = series.section[k];
+			// crosshair.x in ival=v?
+			if (xaxis.p2c(ival[0]) <= crosshair.x && crosshair.x <= xaxis.p2c(ival[1])) {
+			    j = k;
+			    break;
+			}
+			}
+		    }
+
+		    // found something ..
+		    if (j !== undefined) {
+			//console.log(entity.section[j]);
+			var alpha = (series.section.size*1.0-j*1.0)/(series.section.size*1.0)
+			ctx.fillStyle = $.color.parse(series.color).scale('a', 0.7).toString();
+			console.log(ctx.fillStyle);
+			//ctx.fillStyle = parseFloat(vz.options.fillstyle);
+			var width  = xaxis.p2c(ival[1])-xaxis.p2c(ival[0]);
+			ctx.fillRect(xaxis.p2c(ival[0]), 0, width, plot.height());
+		    }
+                }
             }
             ctx.restore();
         });
-
+/*
+for(var h in e.getData()){var u=e.getData()[h], c=e.getAxes().xaxis;
+if(console.log(u.section),void 0!==u.section){
+var f,d;
+for(var p in u.section)
+if("version"!=p&&(d=u.section[p],c.p2c(d[0])<=o.x&&o.x<=c.p2c(d[1]))){f=p;break}
+if(void 0!==f){
+i.fillStyle=t.color.parse(u.color).scale("a",.2).toString();
+var m=c.p2c(d[1])-c.p2c(d[0]);
+i.fillRect(c.p2c(d[0]),0,m,e.height())}}}}
+i.restore()}}),
+*/
+	
         plot.hooks.shutdown.push(function (plot, eventHolder) {
             eventHolder.unbind("mouseout", onMouseOut);
             eventHolder.unbind("mousemove", onMouseMove);
@@ -170,7 +215,7 @@ The plugin also adds four public methods:
     $.plot.plugins.push({
         init: init,
         options: options,
-        name: 'crosshair',
+        name:    'crosshair',
         version: '1.0'
     });
 })(jQuery);

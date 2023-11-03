@@ -97,6 +97,9 @@ vz.entities.loadDetails = function() {
 vz.entities.loadData = function() {
 	var queue = [];
 	vz.entities.each(function(entity) {
+                // CF load section data then ordinary data
+		queue.push(entity.loadSection());
+                // CF
 		queue.push(entity.loadData());
 	}, true); // recursive
 	return $.when.apply($, queue);

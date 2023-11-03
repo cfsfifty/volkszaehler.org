@@ -94,6 +94,9 @@ Entity.prototype.parseJSON = function (json) {
 			// min, max remain undefined
 		};
 	}
+	if (this.section === undefined) {
+		this.section = [];
+	}
 };
 
 /**
@@ -359,15 +362,37 @@ Entity.prototype.loadDetails = function (skipDefaultErrorHandling) {
 	});
 };
 
+// CF load sections for entity
+Entity.prototype.loadSection = function () {
+        //console.log('Entity.loadSection');
+	if (!(this.isChannel() && this.active)) {
+		return $.Deferred().resolve().promise();
+	}
+
+        return vz.load({
+		controller: 'section',
+		url: this.middleware,
+		identifier: this.uuid,
+		context: this,
+		data: {
+		}
+        }).done(function (json) {
+              this.section = json;
+              console.log('Entity.loadSection ' + JSON.stringify(json));
+	});
+}
+
 /**
  * Load data for current view from middleware
  * @return jQuery dereferred object
  */
 Entity.prototype.loadData = function () {
+        //console.log('Entity.loadData');
 	if (!(this.isChannel() && this.active)) {
 		return $.Deferred().resolve().promise();
 	}
-	return vz.load({
+
+        return vz.load({
 		controller: 'data',
 		url: this.middleware,
 		identifier: this.uuid,
@@ -385,9 +410,10 @@ Entity.prototype.loadData = function () {
 				? 'consumption'
 				: vz.options.options
 		}
-	}).done(function (json) {
+        }).done(function (json) {
 		this.data = json.data;
 		this.dataUpdated();
+                //console.log('Entity.loadData ' + JSON.stringify(this.data));
 	});
 };
 
